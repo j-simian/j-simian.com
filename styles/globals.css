@@ -21,6 +21,12 @@ a {
 	display: block;
 }
 
+i,
+b {
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
 .tags {
 	color: #888;
 	margin: 0;

@@ -4,41 +4,55 @@ The word syntax to most computer science students will immediately bring to mind
 
 You may not think about it when you speak, but the order of your words is obviously very important. To say "John hit the dog" and "The dog hit John" means very different things, and to say "hit John dog the" means absolutely nothing.
 
-It is easiest to think about this from bottom up: We'll start by considering noun phrases.
+### Notation
 
-`NP -> N `
+Let's start by defining some notation to simplify our CFGs. The Kleene star, as you probably know, allows us to have as many copies of a variable as we'd like, including zero. We will write `X*` for this, as we know we could simulate it in a standard CFG as follows:
 
-At its most basic, a noun phrase must have a noun (seems simple enough!).
+`A -> XA | ε ≡ X -> A*`
 
-In English, we put adjectives before the noun, and we can have as few or as many as we'd like, which we can represent by the Kleene Star (Some definitions of CFGs do not allow this, but we can simulate it by `NP -> Adj NP | NP`):
+In addition, we will use brackets to show an optional element, which we could simulate in a standard CFG as:
 
-`NP -> (Adj*) N`
+`A -> X | ε ≡ A -> (X)`
 
-We can modify adjectives with adverbs, such as in the phrase "very blue" or "overly sensitive". To show this, we can replace our adjective with and adjective phrase (`AdjP`) and define `AdjP` as follows:
+### Building The CFG
+
+It is easiest to think about this from bottom up: We'll start by considering one of the simplest components of a sentence, an adjectival phrase. An adjective can be modified by an adverb, such as in the adjective phrase "<i>really</i> blue". This gives us the following rule:
 
 `AdjP -> (AdvP*) Adj`
 
-This is a common pattern, and one of the rules of linguistic syntax is that only the "head" (the defining character) of a phrase should be a word, everything else should be a phrase, hence we have `AdvP` instead of `Adv` in the above example. We will define that now:
+Notice that we put `AdvP` (adverbial phrase) instead of `Adv` (adverb). This is because we can modify our adverbs with another adverb, like when we say "very quickly". This gives us the following recursive definition for an adverbial phrase:
 
 `AdvP -> (AdvP*) Adv`
 
-The evidence for the above definition comes from the fact that we can have as many adverbs as we want in place of any single adverb, such as taking the phrase "very hot" and changing it to "very very hot" or "very very very very hot"
-
-We also use determiners (words such as "the", "a", "my", "that") at the start of a noun phrase, but only one (here we use brackets to represent an optional element, which again can be simulated in basic CFGs by `X -> (Y)Z ≡ X -> Z | YZ`):
-
-`NP -> (Det) (AdjP*) N`
-
-The final additions to our noun phrase are prepositional phrases and relative clauses, as in the noun phrases "The dog with brown fur" and "The dog that barks loudly". As we can see, these go after the noun, and if we combine the two examples we get "The dog with brown fur that barks loudly", showing that prepositional phrases should come first.
-
-`NP -> (Det) (AdjP*) N (PP*) (CP*)`
-
-We will come on to clauses later, but prepositional phrases consist of a preposition followed by a noun phrase: "in [the blue house]", "with [the sharp knife]", "under [the very blue table with black legs]"
+The final easy phrase to define will be the prepositional phrase. This one consists of just a preposition, followed by a noun phrase, such as in the phrases: "in <i>the blue house</i>", "with <i>the sharp knife</i>", "under <i>the very blue table with black legs</i>"
 
 `PP -> P NP`
 
+Now we can consider something a bit more complicated, like a noun phrase. At its most basic, a noun phrase must have a noun.
+
+`NP -> N`
+
+In English, we put adjectives before the noun, and we can have as few or as many as we'd like, so we can add in our `AdjP`:
+
+`NP -> (AdjP*) N`
+
+This structure allows for noun phrases such as "<i>big red</i> dog" and "<i>light green</i> book." Notice the subtle difference between these two, which is that in the first, both "big" and "red" are modifying the noun dog, whereas in the second, "light" is part of the adjective phrase because it modifies "green".
+
+We also use determiners (words such as "the", "a", "my", "that") at the start of a noun phrase, but only one:
+
+`NP -> (Det) (AdjP*) N`
+
+We can also modify a noun with a prepositional phrase, such as in "the folder <i>on the desk</i>"
+
+`NP -> (Det) (AdjP*) N (PP*)`
+
+And finally, we can add relative clauses, which we'll define later.
+
+`NP -> (Det) (AdjP*) N (PP*) (CP*)`
+
 Now we should talk about conjunctions for a bit: "The dog and the man" is a valid noun phrase, and "The man who eats alot and who has nice hair" is also a valid noun phrase.
 
-The way conjuctions work is they can take two of the same type of phrase and join them into one, but they cannot take two different types of phrase: "\*The dog and with brown fur", "The man who has nice hair and with blue eyes". We could show this by defining rules such as `NP -> ... | NP conj NP, PP -> ... | PP conj PP`, but for the sake of convenience we will simply say
+The way conjuctions work is they can take two of the same type of phrase and join them into one, but they cannot take two different types of phrase: "\*The dog and with brown fur". We could show this by defining rules such as `NP -> ... | NP conj NP`, `PP -> ... | PP conj PP`, but for the sake of convenience we will simply say
 
 `XP -> XP conj XP`
 
@@ -48,27 +62,35 @@ Now moving upwards towards the root of the sentence, we have verb phrases. You m
 
 `VP -> V`
 
-Obviously verbs can take adverbs, but the interesting part is they can go on either side of the verb: "He ran quickly", "He quickly ran"
+Obviously verbs can take adverbs, but the interesting part is they can go on either side of the verb: "He ran <i>quickly</i>", "He <i>quickly</i> ran"
 
 `VP -> (AdvP*) V (AdvP*)`
 
-We can also modify verbs with prepositional phrases, as in "He ran towards the bridge", and note that the adverb can go on either side of this too: "He ran quickly towards the bridge", "He ran towards the bridge quickly"
+We can also modify verbs with prepositional phrases, as in "He ran <i>towards the bridge</i>", and note that the adverb can go on either side of this too: "He ran <i>quickly</i> towards the bridge", "He ran towards the bridge <i>quickly</i>"
 
 `VP -> (AdvP*) V (AdvP*) (PP*) (AdvP*)`
 
-And finally we need to consider the <i>transitivity</i> of the verb, which means how many arguments it takes. For example, we can say "I sleep", because it is an <i>intransitive</i> verb, but not "I need", as it is a <i>transitive</i> verb that requires a direct object.
+And finally we need to consider the <b>transitivity</b> of the verb, which means how many arguments it takes. For example, we can say "I sleep", because it is an <b>intransitive</b> verb, but not "I need", as it is a <b>transitive</b> verb that requires a direct object.
 
 `VP -> (AdvP*) V (NP) (NP) (AdvP*) (PP*) (AdvP*)`
 
-Arguments to a verb are noun phrases, and you may have noticed that I added two `NP`s and this is because of <i>ditransitive</i> verbs, which take two objects, as in "I gave you the book."
+Arguments to a verb are noun phrases, and you may have noticed that I added two `NP`s and this is because of <b>ditransitive</b> verbs, which take two objects, as in "I gave you the book."
 
-Finally, we need to take into account auxilliary verbs, used to mark some tenses in English, such as the future: "I will eat", which we do with a TP (tensed phrase), and clauses, which are simply a verb phrase (more accurately a tensed phrase) with an optional relativiser
+So, our overall sentence will consist of a noun phrase as the subject, and a verb phrase as the predicate, giving us:
 
-`CP -> (C) TP`
+`TP -> NP VP`
+
+We are missing one element, which is auxilliary verbs, used to mark some tenses in English such as the future ("I will eat"). This is why this type of phrase is called a `TP`, which stands for tense phrase.
 
 `TP -> NP (T) VP`
 
 It is worth noting that our `XP -> XP conj XP` construction applies here, allowing us to form compound sentences such as "I ate the rice and I went to the store"
+
+We are just left with clauses, which are simply a sentence with an optional relativiser(a word like "that" or "which")
+
+`CP -> (C) TP`
+
+### The CFG
 
 The whole set of rules we have so far is:
 
@@ -90,8 +112,20 @@ The whole set of rules we have so far is:
 
 Let's take a look at some sentences and check that they fit our rules:
 
-"We go to the beach in summer, but my cat stays home because he doesn’t own a swimsuit."
+<i>"We go to the beach in summer, but my cat stays home because he doesn’t own a swimsuit."</i>
 
 We can deconstruct this into the following, which if you look at each phrase, abides by the rules.
 
-<Image src="/1_tree.png"></Image>
+<Image src="/1_1_tree.png"></Image>
+
+We can also try and deconstruct some "garden path" sentences, which is a linguistic term for a sentence that takes a few passes to properly understand.
+
+<i>"The complex houses married and single soldiers and their families."</i>
+
+<Image src="/1_2_tree.png"></Image>
+
+Seeing the parse tree helps make it clear that "houses" and "complex" are not as closely linked as they appear when you read the sentence for the first time.
+
+### Conclusion
+
+Our CFG is obviously not exhaustive, as questions and commands have different structures, and we didn't create individual rules for different verb transitivities (exercises for the reader!). But I still found it pretty interesting to see that CFGs are able to capture natural language as well as regular and programming languages, and hope you learned something while reading.
