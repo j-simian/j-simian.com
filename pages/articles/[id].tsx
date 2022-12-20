@@ -10,10 +10,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 };
 
 export const getStaticPaths: GetStaticPaths<{ id: string }> = async () => {
-	let paths: string[] = [];
-	glob(path.join("./articles", "**.mdx"), {}, (_, files) => {
-		paths = files;
-	});
+	let paths: any = new Array(99).map((x) => ({params: {id: x as string}}));
+	console.log(paths);
 
 	return { paths, fallback: "blocking" };
 };
