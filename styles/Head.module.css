@@ -1,0 +1,13 @@
+.container {
+	padding: 20px;
+	flex-shrink: 1;
+	max-height: 50px;
+	display: flex;
+	color: cyan;
+	font-size: 40px;
+	font-family: monospace;
+}
+
+.textBold {
+	font-weight: bold;
+}
