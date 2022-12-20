@@ -45,7 +45,6 @@ async function getPostData(id) {
         allowDangerousHtml: true
     }).use(rehype_raw__WEBPACK_IMPORTED_MODULE_9__["default"]).use(rehype_format__WEBPACK_IMPORTED_MODULE_6__["default"]).use(rehype_stringify__WEBPACK_IMPORTED_MODULE_7__["default"]).process(fileContents);
     let contentHtml = processedContent.toString();
-    console.log(contentHtml);
     return {
         id,
         contentHtml
@@ -84,7 +83,10 @@ const getStaticProps = async ({ params  })=>{
     };
 };
 const getStaticPaths = async ()=>{
-    let paths = new Array(99).map((x)=>({
+    const ids = [
+        "1"
+    ];
+    let paths = ids.map((x)=>({
             params: {
                 id: x
             }

@@ -8,6 +8,7 @@ import rehypeFormat from "rehype-format";
 import rehypeStringify from "rehype-stringify";
 import remarkPrism from "remark-prism";
 import rehypeRaw from "rehype-raw";
+
 export async function getPostData(id: string) {
 	const fullPath = path.join("./articles/", `${id}.mdx`);
 	const fileContents = fs.readFileSync(fullPath, "utf8");
@@ -21,7 +22,6 @@ export async function getPostData(id: string) {
 		.use(rehypeStringify)
 		.process(fileContents);
 	let contentHtml = processedContent.toString();
-	console.log(contentHtml);
 
 	return {
 		id,
