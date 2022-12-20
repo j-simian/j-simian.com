@@ -1,7 +1,5 @@
-import { getPostData } from "../../lib/getPostData";
+import { getPostData, getPostList, Post } from "../../lib/getPostData";
 import { GetStaticPaths, GetStaticProps } from "next";
-import { glob } from "glob";
-import path from "path";
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
 	const postData = await getPostData(params!.id as string);
@@ -10,21 +8,39 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 };
 
 export const getStaticPaths: GetStaticPaths<{ id: string }> = async () => {
-	const ids = ["0", "1"];
-	let paths: any = ids.map((x) => ({ params: { id: x } }));
+	const ids = await getPostList();
+	let paths: any = ids.map((x: string) => ({ params: { id: x } }));
 	console.log(paths);
 
 	return { paths, fallback: "blocking" };
 };
 
-export default function Article({ postData }: any) {
+export default function Article({ postData }: { postData: Post }) {
+	console.log(postData.metadata);
 	return (
 		<>
-			{postData.title}
-			<br />
-			{postData.id}
-			<br />
+			<header className="header">
+				<h1>{postData.metadata.title}</h1>
+				<p className="datePublished">
+					{" "}
+					First published on: {postData.metadata.dateCreated}{" "}
+				</p>
+				<p className="tags">
+					Tags:
+					{postData.metadata.tags.map((x: string) => (
+						<Tag tagName={x} />
+					))}
+				</p>
+			</header>
 			<div dangerouslySetInnerHTML={{ __html: postData.contentHtml }} />
 		</>
 	);
 }
+
+export const Tag = ({ tagName }: { tagName: string }) => {
+	return (
+		<code className="tagElement">
+			<a>#{tagName}</a>
+		</code>
+	);
+};

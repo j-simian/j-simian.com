@@ -1,10 +1,11 @@
 import React from "react";
+import Image from "next/image";
 
 const Head = () => {
 	return (
-		<h1>
-			<b>js</b>.dev
-		</h1>
+		<div>
+			<Image src="/saturn.png" width="100px" height="100px" />
+		</div>
 	);
 };
 

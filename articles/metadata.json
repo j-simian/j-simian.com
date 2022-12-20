@@ -1,0 +1,17 @@
+{
+	"articles": {
+		"0": {
+			"dateCreated": "2022-12-19",
+			"tags": ["lorem"],
+			"title": "Lorem ipsum",
+			"hidden": "true",
+			"subtitle": "dolor sit amet."
+		},
+		"1": {
+			"dateCreated": "2022-12-20",
+			"tags": ["linguistics", "computerscience"],
+			"title": "English as a CFG",
+			"subtitle": "We know about CFGs in computer science from compilers, but did you know we can apply them to natural languages too?"
+		}
+	}
+}
