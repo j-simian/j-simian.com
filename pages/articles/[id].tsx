@@ -2,10 +2,9 @@ import { getPostData } from "../../lib/getPostData";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { glob } from "glob";
 import path from "path";
-import Head from "next/head";
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
-	const postData = await getPostData(params!.id);
+	const postData = await getPostData(params!.id as string);
 
 	return { props: { postData } };
 };
@@ -19,7 +18,7 @@ export const getStaticPaths: GetStaticPaths<{ id: string }> = async () => {
 	return { paths, fallback: "blocking" };
 };
 
-export default function Article({ postData }) {
+export default function Article({ postData }: any) {
 	return (
 		<>
 			{postData.title}
