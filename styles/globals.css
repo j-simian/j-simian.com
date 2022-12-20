@@ -1,7 +1,7 @@
 html,
 body {
 	margin: 0;
-	padding: 0;
+	padding: 2.5%;
 }
 
 a {
@@ -94,6 +94,7 @@ code {
 @media screen and (min-width: 48rem) {
 	html {
 		font-size: 16px;
+		padding: 0;
 	}
 	code {
 		font-size: 1em !important;

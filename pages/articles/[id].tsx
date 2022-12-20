@@ -10,8 +10,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 };
 
 export const getStaticPaths: GetStaticPaths<{ id: string }> = async () => {
-	const ids = ["1"];
-	let paths: any = ids.map((x) => ({ params: { id: x } }))
+	const ids = ["0", "1"];
+	let paths: any = ids.map((x) => ({ params: { id: x } }));
 	console.log(paths);
 
 	return { paths, fallback: "blocking" };
