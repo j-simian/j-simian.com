@@ -79,6 +79,12 @@ html {
 	font-size: 12px;
 }
 
+/* override the syntax highlighting */
+code {
+	font-size: 0.75em !important;
+	white-space: pre-wrap !important;
+}
+
 @media screen and (min-width: 32rem) and (max-width: 48rem) {
 	html {
 		font-size: 15px;
@@ -88,6 +94,9 @@ html {
 @media screen and (min-width: 48rem) {
 	html {
 		font-size: 16px;
+	}
+	code {
+		font-size: 1em !important;
 	}
 }
 
@@ -221,7 +230,7 @@ p {
 pre,
 code {
 	font-family: Menlo, Monaco, "Courier New", monospace;
-	width: 72rem;
+	max-width: 72rem;
 	margin-left: auto;
 	margin-right: auto;
 	border-radius: 0.5rem;
@@ -246,7 +255,8 @@ a:active {
 }
 
 .remark-highlight {
-	width: 72rem;
+	max-width: 72rem;
+	width: 95vw;
 	margin-left: auto;
 	margin-right: auto;
 	border-radius: 0.5rem;
