@@ -1,5 +1,6 @@
 import { getPostData, getPostList, Post } from "../../lib/getPostData";
 import { GetStaticPaths, GetStaticProps } from "next";
+import Link from "next/link";
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
 	const postData = await getPostData(params!.id as string);
@@ -39,8 +40,8 @@ export default function Article({ postData }: { postData: Post }) {
 
 export const Tag = ({ tagName }: { tagName: string }) => {
 	return (
-		<code className="tagElement">
-			<a>#{tagName}</a>
+		<code className="tagElement" style={{ marginBottom: 0 }}>
+			<Link href={`/?tags=${tagName}`}>{`#${tagName}`}</Link>
 		</code>
 	);
 };
