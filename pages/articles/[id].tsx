@@ -11,13 +11,10 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 export const getStaticPaths: GetStaticPaths<{ id: string }> = async () => {
 	const ids = await getPostList();
 	let paths: any = ids.map((x: string) => ({ params: { id: x } }));
-	console.log(paths);
-
 	return { paths, fallback: "blocking" };
 };
 
 export default function Article({ postData }: { postData: Post }) {
-	console.log(postData.metadata);
 	return (
 		<>
 			<header className="header">

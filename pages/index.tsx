@@ -2,11 +2,9 @@ import type { GetStaticProps } from "next";
 import { getPostList, getPostMetadata, PostMetadata } from "../lib/getPostData";
 import { Tag } from "./articles/[id]";
 import Router, { useRouter } from "next/router";
-import { ParsedUrlQuery } from "querystring";
 import Link from "next/link";
-import { useEffect } from "react";
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getStaticProps: GetStaticProps = async () => {
 	const postIds = await getPostList();
 	const postList: PostMetadata[] = [];
 	for (let x in postIds) {

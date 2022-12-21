@@ -22,6 +22,24 @@ export type Post = {
 	metadata: PostMetadata;
 };
 
+export async function renderMD(path: string) {
+	const fileContents = fs.readFileSync(path, "utf8");
+
+	const processedContent = await unified()
+		.use(remarkParse)
+		.use(remarkPrism)
+		.use(remarkRehype, { allowDangerousHtml: true })
+		.use(rehypeRaw)
+		.use(rehypeFormat)
+		.use(rehypeStringify)
+		.process(fileContents);
+	let contentHtml = processedContent.toString();
+
+	return {
+		contentHtml,
+	};
+}
+
 export async function getPostData(id: string): Promise<Post> {
 	const fullPath = path.join("./articles/", `${id}.mdx`);
 	const fileContents = fs.readFileSync(fullPath, "utf8");
