@@ -1,4 +1,5 @@
 import { GetStaticPaths, GetStaticProps } from "next";
+import { DispatchWithoutAction } from "react";
 import { useState } from "react";
 import { getLexicon } from "../../../lib/libFirebase";
 import { firebaseStorage } from "../../_app";
@@ -22,6 +23,15 @@ export type Word = {
 };
 
 type wordType = "adj" | "adv" | "v" | "n" | "prep" | "";
+
+const diacriticMap = {
+	"◌̄": "",
+	ā: "a",
+	ē: "e",
+	ī: "i",
+	ō: "o",
+	ū: "u",
+};
 
 const Language = ({
 	language,
@@ -58,11 +68,11 @@ const Language = ({
 					onChange={(e) => setPos(e.currentTarget.value as wordType)}
 				>
 					<option value="">All</option>
-					<option value="n">Nouns</option>
-					<option value="v">Verbs</option>
 					<option value="adj">Adjectives</option>
 					<option value="adv">Adverbs</option>
+					<option value="n">Nouns</option>
 					<option value="prep">Prepositions</option>
+					<option value="v">Verbs</option>
 				</select>
 				<input
 					style={{ marginRight: "1rem" }}
@@ -82,14 +92,29 @@ const Language = ({
 				}}
 			>
 				{Object.getOwnPropertyNames(lexicon)
+					// Filter to correct part of speech
 					.filter((x: string) =>
 						posFilter == ""
 							? true
 							: lexicon[x].type == (posFilter as string)
 					)
+					// Filter to search (Fasil)
 					.filter((x: string) =>
-						search == "" ? true : x.startsWith(search)
+						search == ""
+							? true
+							: x
+									.split("")
+									.map((c: string) => 
+										Object.keys(diacriticMap).includes(c)
+											? diacriticMap[
+													c as keyof typeof diacriticMap
+											  ]
+											: c
+									)
+									.join("")
+									.startsWith(search)
 					)
+					// Filter to search (English definition)
 					.filter((x: string) =>
 						def == ""
 							? true
