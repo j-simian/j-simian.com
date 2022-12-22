@@ -62,6 +62,7 @@ const Language = ({
 					onChange={(e) => setSearch(e.currentTarget.value)}
 				/>
 				<select
+					style={{ marginRight: "1rem" }}
 					value={posFilter}
 					onChange={(e) =>
 						setPos(
@@ -85,51 +86,86 @@ const Language = ({
 					<option>Prepositions</option>
 				</select>
 				<input
-					style={{ marginLeft: "1rem", marginRight: "1rem" }}
+					style={{ marginRight: "1rem" }}
 					type="text"
 					value={def}
 					onChange={(e) => setDef(e.currentTarget.value)}
 				/>
 			</p>
-			{Object.getOwnPropertyNames(lexicon)
-				.filter((x: string) =>
-					posFilter == ""
-						? true
-						: lexicon[x].type == (posFilter as string)
-				)
-				.filter((x: string) =>
-					search == "" ? true : x.startsWith(search)
-				)
-				.filter((x: string) =>
-					def == ""
-						? true
-						: lexicon[x].definition.some(
-								(x: string) => x.match(def) != null
-						  )
-				)
-				.map((x: string) => (
-					<p
-						style={{
-							position: "relative",
-							marginTop: 0,
-							marginBottom: "1.2rem",
-						}}
-					>
-						<span style={{ position: "absolute" }}>{x}</span>
-						<span
+			<div
+				style={{
+					position: "relative",
+					display: "flex",
+					flexDirection: "column",
+					alignItems: "start",
+					maxWidth: "36rem",
+					margin: "1rem auto 1rem",
+				}}
+			>
+				{Object.getOwnPropertyNames(lexicon)
+					.filter((x: string) =>
+						posFilter == ""
+							? true
+							: lexicon[x].type == (posFilter as string)
+					)
+					.filter((x: string) =>
+						search == "" ? true : x.startsWith(search)
+					)
+					.filter((x: string) =>
+						def == ""
+							? true
+							: lexicon[x].definition.some(
+									(x: string) => x.match(def) != null
+							  )
+					)
+					.map((x: string) => (
+						<p
 							style={{
-								position: "absolute",
-								left: "6rem",
-								fontStyle: "italic",
+								position: "relative",
+								marginLeft: 0,
+								marginRight: 0,
+								marginTop: 0,
+								marginBottom: "1.2rem",
+								height: "min-content",
+								width: "min-content",
 							}}
 						>
-							- {lexicon[x].type}.
-						</span>
-						<span style={{ position: "absolute", left: "9.5rem" }}>
-							- {lexicon[x].definition.join("; ")}
-						</span>
-					</p>
-				))}
+							<span
+								style={{
+									position: "absolute",
+									width: "max-content",
+									left: "0rem",
+									display: "inline-block",
+								}}
+							>
+								{x}
+							</span>
+							<span
+								style={{
+									position: "absolute",
+									left: "6rem",
+									fontStyle: "italic",
+									width: "max-content",
+									display: "inline-block",
+								}}
+							>
+								- {lexicon[x].type}.
+							</span>
+							<span
+								style={{
+									position: "absolute",
+									left: "9.5rem",
+									display: "inline-block",
+									paddingBottom: "1rem",
+									width: "max-content",
+									wordBreak: "break-all",
+								}}
+							>
+								- {lexicon[x].definition.join("; ")}
+							</span>
+						</p>
+					))}
+			</div>
 		</>
 	);
 };
