@@ -21,15 +21,6 @@ export type Word = {
 	type: wordType;
 };
 
-const typeMap = {
-	Adjectives: "adj" as wordType,
-	Nouns: "n" as wordType,
-	Verbs: "v" as wordType,
-	Adverbs: "adv" as wordType,
-	All: "" as wordType,
-	Prepositions: "prep" as wordType,
-};
-
 type wordType = "adj" | "adv" | "v" | "n" | "prep" | "";
 
 const Language = ({
@@ -64,26 +55,14 @@ const Language = ({
 				<select
 					style={{ marginRight: "1rem" }}
 					value={posFilter}
-					onChange={(e) =>
-						setPos(
-							typeMap[
-								e.currentTarget.value as
-									| "Adjectives"
-									| "All"
-									| "Adverbs"
-									| "Nouns"
-									| "Verbs"
-									| "Prepositions"
-							]
-						)
-					}
+					onChange={(e) => setPos(e.currentTarget.value as wordType)}
 				>
-					<option>All</option>
-					<option>Nouns</option>
-					<option>Verbs</option>
-					<option>Adjectives</option>
-					<option>Adverbs</option>
-					<option>Prepositions</option>
+					<option value="">All</option>
+					<option value="n">Nouns</option>
+					<option value="v">Verbs</option>
+					<option value="adj">Adjectives</option>
+					<option value="adv">Adverbs</option>
+					<option value="prep">Prepositions</option>
 				</select>
 				<input
 					style={{ marginRight: "1rem" }}
