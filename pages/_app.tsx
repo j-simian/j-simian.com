@@ -4,10 +4,13 @@ import Head from "../components/Head";
 import { Analytics } from "@vercel/analytics/react";
 import "../styles/globals.css";
 import { useRouter } from "next/router";
+import { initialiseFirebase } from "../lib/libFirebase";
+
+export const { app: firebaseApp, storage: firebaseStorage } =
+	initialiseFirebase();
 
 function MyApp({ Component, pageProps }: AppProps) {
 	const router = useRouter();
-	console.log(router.asPath);
 	return (
 		<>
 			<Head nav={router.asPath == "/"} />
