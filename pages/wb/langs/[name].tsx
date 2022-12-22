@@ -1,7 +1,7 @@
 import { GetStaticPaths, GetStaticProps } from "next";
-import { DispatchWithoutAction } from "react";
-import { useState } from "react";
-import { getLexicon } from "../../../lib/libFirebase";
+import { useState, SetStateAction } from "react";
+import useAdmin from "../../../lib/authenticate";
+import { addWord, getLexicon } from "../../../lib/libFirebase";
 import { firebaseStorage } from "../../_app";
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
@@ -33,6 +33,152 @@ const diacriticMap = {
 	ū: "u",
 };
 
+function buildLexiconList(
+	lexicon: any,
+	search: string,
+	posFilter: wordType,
+	def: string
+) {
+	return (
+		<div
+			style={{
+				position: "relative",
+				display: "flex",
+				flexDirection: "column",
+				alignItems: "start",
+				maxWidth: "36rem",
+				margin: "1rem auto 1rem",
+			}}
+		>
+			{Object.getOwnPropertyNames(lexicon)
+				.sort((a, b) => {
+					let x = Object.keys(diacriticMap).includes(a)
+						? diacriticMap[a as keyof typeof diacriticMap]
+						: a.toLowerCase();
+					let y = Object.keys(diacriticMap).includes(b)
+						? diacriticMap[b as keyof typeof diacriticMap]
+						: b.toLowerCase();
+					return x.localeCompare(y);
+				})
+				// Filter to correct part of speech
+				.filter((x: string) =>
+					posFilter == ""
+						? true
+						: lexicon[x].type.toLowerCase() == (posFilter as string)
+				)
+				// Filter to search (Fasil)
+				.filter((x: string) =>
+					search == ""
+						? true
+						: x
+								.split("")
+								.map((c: string) =>
+									Object.keys(diacriticMap).includes(c)
+										? diacriticMap[
+												c as keyof typeof diacriticMap
+										  ]
+										: c
+								)
+								.join("")
+								.startsWith(search)
+				)
+				// Filter to search (English definition)
+				.filter((x: string) =>
+					def == ""
+						? true
+						: lexicon[x].definition.some(
+								(x: string) => x.match(def) != null
+						  )
+				)
+				.map((x: string) => (
+					<p
+						style={{
+							position: "relative",
+							marginLeft: 0,
+							marginRight: 0,
+							marginTop: 0,
+							marginBottom: "1.2rem",
+							height: "min-content",
+							width: "min-content",
+						}}
+					>
+						<span
+							style={{
+								position: "absolute",
+								width: "max-content",
+								left: "0rem",
+								display: "inline-block",
+							}}
+						>
+							{x}
+						</span>
+						<span
+							style={{
+								position: "absolute",
+								left: "6rem",
+								fontStyle: "italic",
+								width: "max-content",
+								display: "inline-block",
+							}}
+						>
+							- {lexicon[x].type}.
+						</span>
+						<span
+							style={{
+								position: "absolute",
+								left: "9.5rem",
+								display: "inline-block",
+								paddingBottom: "1rem",
+								width: "max-content",
+								wordBreak: "break-all",
+							}}
+						>
+							- {lexicon[x].definition.join("; ")}
+						</span>
+					</p>
+				))}
+		</div>
+	);
+}
+
+function buildFilterBar(
+	search: string,
+	setSearch: React.Dispatch<SetStateAction<string>>,
+	posFilter: wordType,
+	setPos: React.Dispatch<SetStateAction<wordType>>,
+	def: string,
+	setDef: React.Dispatch<SetStateAction<string>>
+) {
+	return (
+		<p>
+			<input
+				style={{ marginRight: "1rem" }}
+				type="text"
+				value={search}
+				onChange={(e) => setSearch(e.currentTarget.value)}
+			/>
+			<select
+				style={{ marginRight: "1rem" }}
+				value={posFilter}
+				onChange={(e) => setPos(e.currentTarget.value as wordType)}
+			>
+				<option value="">All</option>
+				<option value="adj">Adjectives</option>
+				<option value="adv">Adverbs</option>
+				<option value="n">Nouns</option>
+				<option value="prep">Prepositions</option>
+				<option value="v">Verbs</option>
+			</select>
+			<input
+				style={{ marginRight: "1rem" }}
+				type="text"
+				value={def}
+				onChange={(e) => setDef(e.currentTarget.value)}
+			/>
+		</p>
+	);
+}
+
 const Language = ({
 	language,
 	lexicon,
@@ -40,9 +186,25 @@ const Language = ({
 	language: string;
 	lexicon: any;
 }) => {
-	const [posFilter, setPos] = useState<wordType>("");
+	const admin = useAdmin();
+	// Filters
 	const [search, setSearch] = useState("");
+	const [posFilter, setPos] = useState<wordType>("");
 	const [def, setDef] = useState("");
+	// Submit word
+	const [newWord, setNewWord] = useState("");
+	const [newPos, setNewPos] = useState<wordType>("");
+	const [newDef, setNewDef] = useState([""]);
+
+	function submitWord(word: string, pos: wordType, def: string[]) {
+		console.log(
+			`Submitting new word: ${word} - ${pos}. - ${def.join("; ")}`
+		);
+		const obj: { [x: string]: Word } = {
+			[word]: { type: pos, definition: def },
+		};
+		addWord(firebaseStorage, language, obj);
+	}
 
 	return (
 		<>
@@ -55,121 +217,42 @@ const Language = ({
 					.join("")}{" "}
 				Lexicon
 			</h1>
-			<p>
-				<input
-					style={{ marginRight: "1rem" }}
-					type="text"
-					value={search}
-					onChange={(e) => setSearch(e.currentTarget.value)}
-				/>
-				<select
-					style={{ marginRight: "1rem" }}
-					value={posFilter}
-					onChange={(e) => setPos(e.currentTarget.value as wordType)}
-				>
-					<option value="">All</option>
-					<option value="adj">Adjectives</option>
-					<option value="adv">Adverbs</option>
-					<option value="n">Nouns</option>
-					<option value="prep">Prepositions</option>
-					<option value="v">Verbs</option>
-				</select>
-				<input
-					style={{ marginRight: "1rem" }}
-					type="text"
-					value={def}
-					onChange={(e) => setDef(e.currentTarget.value)}
-				/>
-			</p>
-			<div
-				style={{
-					position: "relative",
-					display: "flex",
-					flexDirection: "column",
-					alignItems: "start",
-					maxWidth: "36rem",
-					margin: "1rem auto 1rem",
-				}}
-			>
-				{Object.getOwnPropertyNames(lexicon)
-					// Filter to correct part of speech
-					.filter((x: string) =>
-						posFilter == ""
-							? true
-							: lexicon[x].type == (posFilter as string)
-					)
-					// Filter to search (Fasil)
-					.filter((x: string) =>
-						search == ""
-							? true
-							: x
-									.split("")
-									.map((c: string) => 
-										Object.keys(diacriticMap).includes(c)
-											? diacriticMap[
-													c as keyof typeof diacriticMap
-											  ]
-											: c
-									)
-									.join("")
-									.startsWith(search)
-					)
-					// Filter to search (English definition)
-					.filter((x: string) =>
-						def == ""
-							? true
-							: lexicon[x].definition.some(
-									(x: string) => x.match(def) != null
-							  )
-					)
-					.map((x: string) => (
-						<p
-							style={{
-								position: "relative",
-								marginLeft: 0,
-								marginRight: 0,
-								marginTop: 0,
-								marginBottom: "1.2rem",
-								height: "min-content",
-								width: "min-content",
-							}}
-						>
-							<span
-								style={{
-									position: "absolute",
-									width: "max-content",
-									left: "0rem",
-									display: "inline-block",
-								}}
-							>
-								{x}
-							</span>
-							<span
-								style={{
-									position: "absolute",
-									left: "6rem",
-									fontStyle: "italic",
-									width: "max-content",
-									display: "inline-block",
-								}}
-							>
-								- {lexicon[x].type}.
-							</span>
-							<span
-								style={{
-									position: "absolute",
-									left: "9.5rem",
-									display: "inline-block",
-									paddingBottom: "1rem",
-									width: "max-content",
-									wordBreak: "break-all",
-								}}
-							>
-								- {lexicon[x].definition.join("; ")}
-							</span>
-						</p>
-					))}
-			</div>
+			{buildFilterBar(search, setSearch, posFilter, setPos, def, setDef)}
+			{buildLexiconList(lexicon, search, posFilter, def)}
+			{admin ? (
+				<p>
+					<input
+						type="text"
+						style={{ width: "6rem" }}
+						value={newWord}
+						onChange={(e) => setNewWord(e.currentTarget.value)}
+					></input>
+					<input
+						type="text"
+						style={{ width: "3.5rem" }}
+						value={newPos}
+						onChange={(e) =>
+							setNewPos(e.currentTarget.value as wordType)
+						}
+					></input>
+					<input
+						type="text"
+						style={{ width: "20.5rem" }}
+						value={newDef.join("; ")}
+						onChange={(e) =>
+							setNewDef(e.currentTarget.value.split("; "))
+						}
+					></input>
+					<button
+						style={{ width: "4rem" }}
+						onClick={() => submitWord(newWord, newPos, newDef)}
+					>
+						+
+					</button>
+				</p>
+			) : (
+				<></>
+			)}
 		</>
 	);
 };

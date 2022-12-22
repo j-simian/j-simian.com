@@ -1,5 +1,12 @@
 import { FirebaseApp, initializeApp } from "firebase/app";
-import { FirebaseStorage, getBytes, getStorage, ref } from "firebase/storage";
+import {
+	FirebaseStorage,
+	getBytes,
+	getStorage,
+	ref,
+	uploadBytes,
+} from "firebase/storage";
+import { Word } from "../pages/wb/langs/[name]";
 
 export type FirebaseApps = {
 	app: FirebaseApp;
@@ -28,6 +35,39 @@ export async function getLexicon(storage: FirebaseStorage, lang: string) {
 	let string = decodeUTF(uint);
 	let obj = JSON.parse(string);
 	return obj;
+}
+
+export async function addWord(
+	storage: FirebaseStorage,
+	lang: string,
+	word: { [x: string]: Word }
+) {
+	let lexicon = await getLexicon(storage, lang);
+	lexicon = { ...lexicon, ...word };
+	let string = JSON.stringify(lexicon, null, 4);
+	const storageRef = ref(storage, `langs/${lang}/lexicon.json`);
+	console.log(encodeUTF(string));
+	await uploadBytes(storageRef, encodeUTF(string));
+	console.log(`Successfully added word: ${word}`);
+}
+
+function encodeUTF(string: string) {
+	const codes: number[] = string
+		.split("")
+		.map((c: string) => c.charCodeAt(0));
+	const uint = new Uint8Array(
+		codes.map((c: number) => encodeUTFChar(c)).flat()
+	);
+	return uint;
+}
+
+function encodeUTFChar(c: number) {
+	if (c < 0x80) return [c];
+	else if (c < 0x800) {
+		return [0xc0 | (c >> 6), 0x80 | (c & 0x3f)];
+	} else if (c < 0xd800 || c >= 0xe000) {
+		return [0xe0 | (c >> 12), 0x80 | ((c >> 6) & 0x3f), 0x80 | (c & 0x3f)];
+	} else return [];
 }
 
 function decodeUTF(array: Uint8Array) {
