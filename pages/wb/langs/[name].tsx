@@ -185,7 +185,6 @@ const Language = ({
 }: {
 	language: string;
 	lexicon: any;
-	admin: boolean | "Loading;";
 }) => {
 	// Filters
 	const [search, setSearch] = useState("");

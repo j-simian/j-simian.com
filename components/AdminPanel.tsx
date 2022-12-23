@@ -1,4 +1,5 @@
-import { GetServerSideProps } from "next";
+import { useRouter } from "next/router";
+import { useRef } from "react";
 import { useState } from "react";
 import useAdmin from "../lib/authenticate";
 import { addWord } from "../lib/libFirebase";
@@ -7,11 +8,13 @@ import { firebaseStorage } from "../pages/_app";
 
 const AdminPanel = ({ language }: { language: string }) => {
 	const admin = useAdmin();
+	const router = useRouter();
 	console.log(admin);
 
 	const [newWord, setNewWord] = useState("");
 	const [newPos, setNewPos] = useState<wordType>("");
 	const [newDef, setNewDef] = useState([""]);
+	const defRef = useRef<HTMLInputElement | null>(null);
 
 	function submitWord(word: string, pos: wordType, def: string[]) {
 		console.log(
@@ -26,36 +29,79 @@ const AdminPanel = ({ language }: { language: string }) => {
 	return (
 		<>
 			{admin && admin != "Loading" ? (
-				<p>
-					<input
-						type="text"
-						style={{ width: "6rem" }}
-						value={newWord}
-						onChange={(e) => setNewWord(e.currentTarget.value)}
-					></input>
-					<input
-						type="text"
-						style={{ width: "3.5rem" }}
-						value={newPos}
-						onChange={(e) =>
-							setNewPos(e.currentTarget.value as wordType)
-						}
-					></input>
-					<input
-						type="text"
-						style={{ width: "20.5rem" }}
-						value={newDef.join("; ")}
-						onChange={(e) =>
-							setNewDef(e.currentTarget.value.split("; "))
-						}
-					></input>
-					<button
-						style={{ width: "4rem" }}
-						onClick={() => submitWord(newWord, newPos, newDef)}
-					>
-						+
-					</button>
-				</p>
+				<>
+					<p style={{ marginBottom: 0, marginTop: 0 }}>
+						<input
+							type="text"
+							ref={defRef}
+							style={{ width: "6rem" }}
+							value={newWord}
+							onChange={(e) => setNewWord(e.currentTarget.value)}
+						></input>
+						<input
+							type="text"
+							style={{ width: "3.5rem" }}
+							value={newPos}
+							onChange={(e) =>
+								setNewPos(e.currentTarget.value as wordType)
+							}
+						></input>
+						<input
+							type="text"
+							style={{ width: "20.5rem" }}
+							value={newDef.join("; ")}
+							onChange={(e) =>
+								setNewDef(e.currentTarget.value.split("; "))
+							}
+						></input>
+						<button
+							style={{ width: "5rem" }}
+							onClick={() => {
+								if (!newWord || !newPos || !newDef) return;
+								submitWord(newWord, newPos, newDef);
+								setTimeout(
+									() => router.push(`/wb/langs/${language}`),
+									500
+								);
+							}}
+						>
+							+
+						</button>
+						<button
+							onClick={() => {
+								setNewWord((x) => x + "ā");
+								defRef.current?.focus();
+							}}
+						>
+							ā
+						</button>
+						<button
+							onClick={() => {
+								setNewWord((x) => x + "ē");
+								defRef.current?.focus();
+							}}
+						>
+							ē
+						</button>
+						<button
+							onClick={() => {
+								setNewWord((x) => x + "ī");
+								defRef.current?.focus();
+							}}
+						>
+							ī
+						</button>
+						<button
+							onClick={() => {
+								setNewWord((x) => x + "ū");
+								defRef.current?.focus();
+							}}
+						>
+							ū
+						</button>
+					</p>
+					<p style={{ marginTop: 0, marginBottom: 0 }}></p>
+				</>
 			) : (
 				<></>
 			)}
