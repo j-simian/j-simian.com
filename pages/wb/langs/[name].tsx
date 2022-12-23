@@ -1,7 +1,7 @@
 import { GetStaticPaths, GetStaticProps } from "next";
 import { useState, SetStateAction } from "react";
-import useAdmin from "../../../lib/authenticate";
-import { addWord, getLexicon } from "../../../lib/libFirebase";
+import AdminPanel from "../../../components/AdminPanel";
+import { getLexicon } from "../../../lib/libFirebase";
 import { firebaseStorage } from "../../_app";
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
@@ -22,7 +22,7 @@ export type Word = {
 	type: wordType;
 };
 
-type wordType = "adj" | "adv" | "v" | "n" | "prep" | "";
+export type wordType = "adj" | "adv" | "v" | "n" | "prep" | "";
 
 const diacriticMap = {
 	"◌̄": "",
@@ -185,26 +185,12 @@ const Language = ({
 }: {
 	language: string;
 	lexicon: any;
+	admin: boolean | "Loading;";
 }) => {
-	const admin = useAdmin();
 	// Filters
 	const [search, setSearch] = useState("");
 	const [posFilter, setPos] = useState<wordType>("");
 	const [def, setDef] = useState("");
-	// Submit word
-	const [newWord, setNewWord] = useState("");
-	const [newPos, setNewPos] = useState<wordType>("");
-	const [newDef, setNewDef] = useState([""]);
-
-	function submitWord(word: string, pos: wordType, def: string[]) {
-		console.log(
-			`Submitting new word: ${word} - ${pos}. - ${def.join("; ")}`
-		);
-		const obj: { [x: string]: Word } = {
-			[word]: { type: pos, definition: def },
-		};
-		addWord(firebaseStorage, language, obj);
-	}
 
 	return (
 		<>
@@ -219,40 +205,7 @@ const Language = ({
 			</h1>
 			{buildFilterBar(search, setSearch, posFilter, setPos, def, setDef)}
 			{buildLexiconList(lexicon, search, posFilter, def)}
-			{admin ? (
-				<p>
-					<input
-						type="text"
-						style={{ width: "6rem" }}
-						value={newWord}
-						onChange={(e) => setNewWord(e.currentTarget.value)}
-					></input>
-					<input
-						type="text"
-						style={{ width: "3.5rem" }}
-						value={newPos}
-						onChange={(e) =>
-							setNewPos(e.currentTarget.value as wordType)
-						}
-					></input>
-					<input
-						type="text"
-						style={{ width: "20.5rem" }}
-						value={newDef.join("; ")}
-						onChange={(e) =>
-							setNewDef(e.currentTarget.value.split("; "))
-						}
-					></input>
-					<button
-						style={{ width: "4rem" }}
-						onClick={() => submitWord(newWord, newPos, newDef)}
-					>
-						+
-					</button>
-				</p>
-			) : (
-				<></>
-			)}
+			<AdminPanel language={language} />
 		</>
 	);
 };
