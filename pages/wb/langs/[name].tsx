@@ -22,7 +22,7 @@ export type Word = {
 	type: wordType;
 };
 
-export type wordType = "adj" | "adv" | "v" | "n" | "prep" | "";
+export type wordType = "adj" | "adv" | "v" | "n" | "N" | "prep" | "";
 
 const diacriticMap = {
 	"◌̄": "",
@@ -64,7 +64,7 @@ function buildLexiconList(
 				.filter((x: string) =>
 					posFilter == ""
 						? true
-						: lexicon[x].type.toLowerCase() == (posFilter as string)
+						: lexicon[x].type == (posFilter as string)
 				)
 				// Filter to search (Fasil)
 				.filter((x: string) =>
@@ -167,6 +167,7 @@ function buildFilterBar(
 				<option value="adv">Adverbs</option>
 				<option value="n">Nouns</option>
 				<option value="prep">Prepositions</option>
+				<option value="N">Proper nouns</option>
 				<option value="v">Verbs</option>
 			</select>
 			<input
@@ -175,6 +176,16 @@ function buildFilterBar(
 				value={def}
 				onChange={(e) => setDef(e.currentTarget.value)}
 			/>
+			<button
+				onClick={() => {
+					window.scrollTo({
+						top: document.documentElement.scrollHeight,
+						behavior: "smooth",
+					});
+				}}
+			>
+				ᐯ
+			</button>
 		</p>
 	);
 }
@@ -191,6 +202,59 @@ const Language = ({
 	const [posFilter, setPos] = useState<wordType>("");
 	const [def, setDef] = useState("");
 
+	function copyText() {
+		const text = Object.getOwnPropertyNames(lexicon)
+			.sort((a, b) => {
+				let x = Object.keys(diacriticMap).includes(a)
+					? diacriticMap[a as keyof typeof diacriticMap]
+					: a.toLowerCase();
+				let y = Object.keys(diacriticMap).includes(b)
+					? diacriticMap[b as keyof typeof diacriticMap]
+					: b.toLowerCase();
+				return x.localeCompare(y);
+			})
+			// Filter to correct part of speech
+			.filter((x: string) =>
+				posFilter == ""
+					? true
+					: lexicon[x].type == (posFilter as string)
+			)
+			// Filter to search (Fasil)
+			.filter((x: string) =>
+				search == ""
+					? true
+					: x
+							.split("")
+							.map((c: string) =>
+								Object.keys(diacriticMap).includes(c)
+									? diacriticMap[
+											c as keyof typeof diacriticMap
+									  ]
+									: c
+							)
+							.join("")
+							.startsWith(search)
+			)
+			// Filter to search (English definition)
+			.filter((x: string) =>
+				def == ""
+					? true
+					: lexicon[x].definition.some(
+							(x: string) => x.match(def) != null
+					  )
+			)
+			.map(
+				(x: string) =>
+					`\t${x}${"\t".repeat(4 - (x.length + 1) / 4)}- ${
+						lexicon[x].type
+					}. ${"\t".repeat(
+						2 - (lexicon[x].type.length + 1) / 4
+					)}- ${lexicon[x].definition.join("; ")}`
+			)
+			.join("\n");
+		navigator.clipboard.writeText(text);
+	}
+
 	return (
 		<>
 			<h1>
@@ -204,7 +268,7 @@ const Language = ({
 			</h1>
 			{buildFilterBar(search, setSearch, posFilter, setPos, def, setDef)}
 			{buildLexiconList(lexicon, search, posFilter, def)}
-			<AdminPanel language={language} />
+			<AdminPanel language={language} copyText={copyText} />
 		</>
 	);
 };

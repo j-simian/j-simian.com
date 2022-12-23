@@ -6,13 +6,19 @@ import { addWord } from "../lib/libFirebase";
 import { Word, wordType } from "../pages/wb/langs/[name]";
 import { firebaseStorage } from "../pages/_app";
 
-const AdminPanel = ({ language }: { language: string }) => {
+const AdminPanel = ({
+	language,
+	copyText,
+}: {
+	language: string;
+	copyText: () => void;
+}) => {
 	const admin = useAdmin();
 	const router = useRouter();
 	console.log(admin);
 
 	const [newWord, setNewWord] = useState("");
-	const [newPos, setNewPos] = useState<wordType>("");
+	const [newPos, setNewPos] = useState<wordType>("n");
 	const [newDef, setNewDef] = useState([""]);
 	const defRef = useRef<HTMLInputElement | null>(null);
 
@@ -38,14 +44,20 @@ const AdminPanel = ({ language }: { language: string }) => {
 							value={newWord}
 							onChange={(e) => setNewWord(e.currentTarget.value)}
 						></input>
-						<input
-							type="text"
+						<select
 							style={{ width: "3.5rem" }}
 							value={newPos}
 							onChange={(e) =>
 								setNewPos(e.currentTarget.value as wordType)
 							}
-						></input>
+						>
+							<option value="adj">Adjectives</option>
+							<option value="adv">Adverbs</option>
+							<option value="n">Nouns</option>
+							<option value="prep">Prepositions</option>
+							<option value="N">Proper nouns</option>
+							<option value="v">Verbs</option>
+						</select>
 						<input
 							type="text"
 							style={{ width: "20.5rem" }}
@@ -59,6 +71,9 @@ const AdminPanel = ({ language }: { language: string }) => {
 							onClick={() => {
 								if (!newWord || !newPos || !newDef) return;
 								submitWord(newWord, newPos, newDef);
+								setNewWord("");
+								setNewPos("");
+								setNewDef([]);
 								setTimeout(
 									() => router.push(`/wb/langs/${language}`),
 									500
@@ -99,8 +114,24 @@ const AdminPanel = ({ language }: { language: string }) => {
 						>
 							ū
 						</button>
+						<button
+							onClick={() => {
+								copyText();
+							}}
+						>
+							🗄
+						</button>
+						<button
+							onClick={() => {
+								window.scrollTo({
+									top: 0,
+									behavior: "smooth",
+								});
+							}}
+						>
+							ᐱ
+						</button>
 					</p>
-					<p style={{ marginTop: 0, marginBottom: 0 }}></p>
 				</>
 			) : (
 				<></>
