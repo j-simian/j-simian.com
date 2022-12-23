@@ -22,7 +22,7 @@ export type Word = {
 	type: wordType;
 };
 
-export type wordType = "adj" | "adv" | "v" | "n" | "N" | "prep" | "";
+export type wordType = "adj" | "adv" | "v" | "n" | "N" | "prep" | "inj. "| "";
 
 const diacriticMap = {
 	"◌̄": "",
@@ -40,104 +40,106 @@ function buildLexiconList(
 	def: string
 ) {
 	return (
-		<div
-			style={{
-				position: "relative",
-				display: "flex",
-				flexDirection: "column",
-				alignItems: "start",
-				maxWidth: "36rem",
-				margin: "1rem auto 1rem",
-			}}
-		>
-			{Object.getOwnPropertyNames(lexicon)
-				.sort((a, b) => {
-					let x = Object.keys(diacriticMap).includes(a)
-						? diacriticMap[a as keyof typeof diacriticMap]
-						: a.toLowerCase();
-					let y = Object.keys(diacriticMap).includes(b)
-						? diacriticMap[b as keyof typeof diacriticMap]
-						: b.toLowerCase();
-					return x.localeCompare(y);
-				})
-				// Filter to correct part of speech
-				.filter((x: string) =>
-					posFilter == ""
-						? true
-						: lexicon[x].type == (posFilter as string)
-				)
-				// Filter to search (Fasil)
-				.filter((x: string) =>
-					search == ""
-						? true
-						: x
-								.split("")
-								.map((c: string) =>
-									Object.keys(diacriticMap).includes(c)
-										? diacriticMap[
-												c as keyof typeof diacriticMap
-										  ]
-										: c
-								)
-								.join("")
-								.startsWith(search)
-				)
-				// Filter to search (English definition)
-				.filter((x: string) =>
-					def == ""
-						? true
-						: lexicon[x].definition.some(
-								(x: string) => x.match(def) != null
-						  )
-				)
-				.map((x: string) => (
-					<p
-						style={{
-							position: "relative",
-							marginLeft: 0,
-							marginRight: 0,
-							marginTop: 0,
-							marginBottom: "1.2rem",
-							height: "min-content",
-							width: "min-content",
-						}}
-					>
-						<span
+		<>
+			<div
+				style={{
+					position: "relative",
+					display: "flex",
+					flexDirection: "column",
+					alignItems: "start",
+					maxWidth: "36rem",
+					margin: "1rem auto 1rem",
+				}}
+			>
+				{Object.getOwnPropertyNames(lexicon)
+					.sort((a, b) => {
+						let x = Object.keys(diacriticMap).includes(a)
+							? diacriticMap[a as keyof typeof diacriticMap]
+							: a.toLowerCase();
+						let y = Object.keys(diacriticMap).includes(b)
+							? diacriticMap[b as keyof typeof diacriticMap]
+							: b.toLowerCase();
+						return x.localeCompare(y);
+					})
+					// Filter to correct part of speech
+					.filter((x: string) =>
+						posFilter == ""
+							? true
+							: lexicon[x].type == (posFilter as string)
+					)
+					// Filter to search (Fasil)
+					.filter((x: string) =>
+						search == ""
+							? true
+							: x
+									.split("")
+									.map((c: string) =>
+										Object.keys(diacriticMap).includes(c)
+											? diacriticMap[
+													c as keyof typeof diacriticMap
+											  ]
+											: c
+									)
+									.join("")
+									.startsWith(search)
+					)
+					// Filter to search (English definition)
+					.filter((x: string) =>
+						def == ""
+							? true
+							: lexicon[x].definition.some(
+									(x: string) => x.match(def) != null
+							  )
+					)
+					.map((x: string) => (
+						<p
 							style={{
-								position: "absolute",
-								width: "max-content",
-								left: "0rem",
-								display: "inline-block",
+								position: "relative",
+								marginLeft: 0,
+								marginRight: 0,
+								marginTop: 0,
+								marginBottom: "1.2rem",
+								height: "min-content",
+								width: "min-content",
 							}}
 						>
-							{x}
-						</span>
-						<span
-							style={{
-								position: "absolute",
-								left: "6rem",
-								fontStyle: "italic",
-								width: "max-content",
-								display: "inline-block",
-							}}
-						>
-							- {lexicon[x].type}.
-						</span>
-						<span
-							style={{
-								position: "absolute",
-								left: "9.5rem",
-								display: "inline-block",
-								paddingBottom: "1rem",
-								width: "max-content",
-								wordBreak: "break-all",
-							}}
-						>
-							- {lexicon[x].definition.join("; ")}
-						</span>
-					</p>
-				))}
-		</div>
+							<span
+								style={{
+									position: "absolute",
+									width: "max-content",
+									left: "0rem",
+									display: "inline-block",
+								}}
+							>
+								{x}
+							</span>
+							<span
+								style={{
+									position: "absolute",
+									left: "6rem",
+									fontStyle: "italic",
+									width: "max-content",
+									display: "inline-block",
+								}}
+							>
+								- {lexicon[x].type}.
+							</span>
+							<span
+								style={{
+									position: "absolute",
+									left: "9.5rem",
+									display: "inline-block",
+									paddingBottom: "1rem",
+									width: "max-content",
+									wordBreak: "break-all",
+								}}
+							>
+								- {lexicon[x].definition.join("; ")}
+							</span>
+						</p>
+					))}
+			</div>
+		</>
 	);
 }
 
@@ -268,7 +270,11 @@ const Language = ({
 			</h1>
 			{buildFilterBar(search, setSearch, posFilter, setPos, def, setDef)}
 			{buildLexiconList(lexicon, search, posFilter, def)}
-			<AdminPanel language={language} copyText={copyText} />
+			<AdminPanel
+				language={language}
+				copyText={copyText}
+				size={Object.getOwnPropertyNames(lexicon).length}
+			/>
 		</>
 	);
 };

@@ -9,9 +9,11 @@ import { firebaseStorage } from "../pages/_app";
 const AdminPanel = ({
 	language,
 	copyText,
+	size,
 }: {
 	language: string;
 	copyText: () => void;
+	size: number;
 }) => {
 	const admin = useAdmin();
 	const router = useRouter();
@@ -36,6 +38,8 @@ const AdminPanel = ({
 		<>
 			{admin && admin != "Loading" ? (
 				<>
+					<br />
+					<p>Current words: {size}</p>
 					<p style={{ marginBottom: 0, marginTop: 0 }}>
 						<input
 							type="text"
@@ -53,6 +57,7 @@ const AdminPanel = ({
 						>
 							<option value="adj">Adjectives</option>
 							<option value="adv">Adverbs</option>
+							<option value="inj">Interjection</option>
 							<option value="n">Nouns</option>
 							<option value="prep">Prepositions</option>
 							<option value="N">Proper nouns</option>
@@ -72,7 +77,7 @@ const AdminPanel = ({
 								if (!newWord || !newPos || !newDef) return;
 								submitWord(newWord, newPos, newDef);
 								setNewWord("");
-								setNewPos("");
+								setNewPos("n");
 								setNewDef([]);
 								setTimeout(
 									() => router.push(`/wb/langs/${language}`),
