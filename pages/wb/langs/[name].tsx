@@ -1,6 +1,13 @@
 import { GetStaticPaths, GetStaticProps } from "next";
 import { useState, SetStateAction } from "react";
+import { isNullOrUndefined } from "util";
 import AdminPanel from "../../../components/AdminPanel";
+import {
+	posMap,
+	wordType,
+	diacriticMap,
+	Word,
+} from "../../../lib/langsHelpers";
 import { getLexicon } from "../../../lib/libFirebase";
 import { firebaseStorage } from "../../_app";
 
@@ -17,189 +24,15 @@ export const getStaticPaths: GetStaticPaths = async () => {
 	};
 };
 
-export type Word = {
-	definition: string[];
-	type: wordType;
-};
-
-export type wordType = "adj" | "adv" | "v" | "n" | "N" | "prep" | "inj. "| "";
-
-const diacriticMap = {
-	"◌̄": "",
-	ā: "a",
-	ē: "e",
-	ī: "i",
-	ō: "o",
-	ū: "u",
-};
-
-function buildLexiconList(
-	lexicon: any,
-	search: string,
-	posFilter: wordType,
-	def: string
-) {
-	return (
-		<>
-			<div
-				style={{
-					position: "relative",
-					display: "flex",
-					flexDirection: "column",
-					alignItems: "start",
-					maxWidth: "36rem",
-					margin: "1rem auto 1rem",
-				}}
-			>
-				{Object.getOwnPropertyNames(lexicon)
-					.sort((a, b) => {
-						let x = Object.keys(diacriticMap).includes(a)
-							? diacriticMap[a as keyof typeof diacriticMap]
-							: a.toLowerCase();
-						let y = Object.keys(diacriticMap).includes(b)
-							? diacriticMap[b as keyof typeof diacriticMap]
-							: b.toLowerCase();
-						return x.localeCompare(y);
-					})
-					// Filter to correct part of speech
-					.filter((x: string) =>
-						posFilter == ""
-							? true
-							: lexicon[x].type == (posFilter as string)
-					)
-					// Filter to search (Fasil)
-					.filter((x: string) =>
-						search == ""
-							? true
-							: x
-									.split("")
-									.map((c: string) =>
-										Object.keys(diacriticMap).includes(c)
-											? diacriticMap[
-													c as keyof typeof diacriticMap
-											  ]
-											: c
-									)
-									.join("")
-									.startsWith(search)
-					)
-					// Filter to search (English definition)
-					.filter((x: string) =>
-						def == ""
-							? true
-							: lexicon[x].definition.some(
-									(x: string) => x.match(def) != null
-							  )
-					)
-					.map((x: string) => (
-						<p
-							style={{
-								position: "relative",
-								marginLeft: 0,
-								marginRight: 0,
-								marginTop: 0,
-								marginBottom: "1.2rem",
-								height: "min-content",
-								width: "min-content",
-							}}
-						>
-							<span
-								style={{
-									position: "absolute",
-									width: "max-content",
-									left: "0rem",
-									display: "inline-block",
-								}}
-							>
-								{x}
-							</span>
-							<span
-								style={{
-									position: "absolute",
-									left: "6rem",
-									fontStyle: "italic",
-									width: "max-content",
-									display: "inline-block",
-								}}
-							>
-								- {lexicon[x].type}.
-							</span>
-							<span
-								style={{
-									position: "absolute",
-									left: "9.5rem",
-									display: "inline-block",
-									paddingBottom: "1rem",
-									width: "max-content",
-									wordBreak: "break-all",
-								}}
-							>
-								- {lexicon[x].definition.join("; ")}
-							</span>
-						</p>
-					))}
-			</div>
-		</>
-	);
-}
-
-function buildFilterBar(
-	search: string,
-	setSearch: React.Dispatch<SetStateAction<string>>,
-	posFilter: wordType,
-	setPos: React.Dispatch<SetStateAction<wordType>>,
-	def: string,
-	setDef: React.Dispatch<SetStateAction<string>>
-) {
-	return (
-		<p>
-			<input
-				style={{ marginRight: "1rem" }}
-				type="text"
-				value={search}
-				onChange={(e) => setSearch(e.currentTarget.value)}
-			/>
-			<select
-				style={{ marginRight: "1rem" }}
-				value={posFilter}
-				onChange={(e) => setPos(e.currentTarget.value as wordType)}
-			>
-				<option value="">All</option>
-				<option value="adj">Adjectives</option>
-				<option value="adv">Adverbs</option>
-				<option value="n">Nouns</option>
-				<option value="prep">Prepositions</option>
-				<option value="N">Proper nouns</option>
-				<option value="v">Verbs</option>
-			</select>
-			<input
-				style={{ marginRight: "1rem" }}
-				type="text"
-				value={def}
-				onChange={(e) => setDef(e.currentTarget.value)}
-			/>
-			<button
-				onClick={() => {
-					window.scrollTo({
-						top: document.documentElement.scrollHeight,
-						behavior: "smooth",
-					});
-				}}
-			>
-				ᐯ
-			</button>
-		</p>
-	);
-}
-
 const Language = ({
 	language,
 	lexicon,
 }: {
 	language: string;
-	lexicon: any;
+	lexicon: { [x: string]: Word };
 }) => {
-	// Filters
+	const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+
 	const [search, setSearch] = useState("");
 	const [posFilter, setPos] = useState<wordType>("");
 	const [def, setDef] = useState("");
@@ -242,8 +75,19 @@ const Language = ({
 				def == ""
 					? true
 					: lexicon[x].definition.some(
-							(x: string) => x.match(def) != null
-					  )
+							(a: string) => a.match(def) != null
+					  ) ||
+					  (lexicon[x].derivations
+							? Object.getOwnPropertyNames(lexicon[x].derivations)
+									.map((y: string) =>
+										lexicon[x].derivations![
+											y
+										]!.definition.some(
+											(b: string) => b.match(def) != null
+										)
+									)
+									.some((z) => z)
+							: false)
 			)
 			.map(
 				(x: string) =>
@@ -257,6 +101,244 @@ const Language = ({
 		navigator.clipboard.writeText(text);
 	}
 
+	function buildExpandedWord(x: string, word: Word) {
+		if (
+			word.derivations &&
+			Object.getOwnPropertyNames(word.derivations).length > 0
+		) {
+			if (expandedItems.has(x)) {
+				return (
+					<span
+						style={{ position: "absolute", left: "-2rem" }}
+						onClick={() =>
+							setExpandedItems((s: Set<string>) => {
+								s.delete(x);
+								return new Set(s);
+							})
+						}
+					>
+						▼
+					</span>
+				);
+			} else {
+				return (
+					<span
+						style={{ position: "absolute", left: "-2rem" }}
+						onClick={() =>
+							setExpandedItems((s: Set<string>) => {
+								s.add(x);
+								return new Set(s);
+							})
+						}
+					>
+						ᐅ
+					</span>
+				);
+			}
+		}
+	}
+
+	function buildWord(
+		x: string,
+		word: Word,
+		indent?: boolean
+	): React.ReactElement {
+		return (
+			<>
+				<p
+					style={{
+						position: "relative",
+						marginLeft: 0,
+						marginRight: 0,
+						marginTop: 0,
+						marginBottom: "1.2rem",
+						height: "min-content",
+						width: "min-content",
+					}}
+				>
+					{buildExpandedWord(x, word)}
+					<span
+						style={{
+							position: "absolute",
+							width: "max-content",
+							left: indent ? "2rem" : "0rem",
+							display: "inline-block",
+						}}
+					>
+						{x}
+					</span>
+					<span
+						style={{
+							position: "absolute",
+							left: "6rem",
+							fontStyle: "italic",
+							width: "max-content",
+							display: "inline-block",
+						}}
+					>
+						- {word.type}.
+					</span>
+					<span
+						style={{
+							position: "absolute",
+							left: "9.5rem",
+							display: "inline-block",
+							paddingBottom: "1rem",
+							width: "max-content",
+							wordBreak: "break-all",
+						}}
+					>
+						- {word.definition.join("; ")}
+					</span>
+				</p>
+				{expandedItems.has(x) ? (
+					Object.getOwnPropertyNames(word.derivations!).map(
+						(w: string) => buildWord(w, word.derivations![w], true)
+					)
+				) : (
+					<></>
+				)}
+			</>
+		);
+	}
+
+	function buildLexiconList() {
+		return (
+			<>
+				<div
+					style={{
+						position: "relative",
+						display: "flex",
+						flexDirection: "column",
+						alignItems: "start",
+						maxWidth: "36rem",
+						margin: "1rem auto 1rem",
+					}}
+				>
+					{Object.getOwnPropertyNames(lexicon)
+						.sort((a, b) => {
+							let x = Object.keys(diacriticMap).includes(a)
+								? diacriticMap[a as keyof typeof diacriticMap]
+								: a.toLowerCase();
+							let y = Object.keys(diacriticMap).includes(b)
+								? diacriticMap[b as keyof typeof diacriticMap]
+								: b.toLowerCase();
+							return x.localeCompare(y);
+						})
+						// Filter to correct part of speech
+						.filter((x: string) =>
+							posFilter == ""
+								? true
+								: lexicon[x].type == (posFilter as string)
+						)
+						// Filter to search (Fasil)
+						.filter((x: string) =>
+							search == ""
+								? true
+								: x
+										.split("")
+										.map((c: string) =>
+											Object.keys(diacriticMap).includes(
+												c
+											)
+												? diacriticMap[
+														c as keyof typeof diacriticMap
+												  ]
+												: c
+										)
+										.join("")
+										.startsWith(search)
+						)
+						// Filter to search (English definition)
+						.filter((x: string) =>
+							def == ""
+								? true
+								: lexicon[x].definition.some(
+										(a: string) => a.match(def) != null
+								  ) ||
+								  (lexicon[x].derivations
+										? Object.getOwnPropertyNames(
+												lexicon[x].derivations
+										  )
+												.map((y: string) =>
+													lexicon[x].derivations![
+														y
+													].definition!.some(
+														(b: string) =>
+															b.match(def) != null
+													)
+												)
+												.some((z) => z)
+										: false)
+						)
+						.map((x: string) => buildWord(x, lexicon[x]))}
+				</div>
+			</>
+		);
+	}
+
+	function buildFilterBar() {
+		return (
+			<p>
+				<input
+					style={{ marginRight: "1rem" }}
+					type="text"
+					value={search}
+					onChange={(e) => setSearch(e.currentTarget.value)}
+				/>
+				<select
+					style={{ marginRight: "1rem" }}
+					value={posFilter}
+					onChange={(e) => setPos(e.currentTarget.value as wordType)}
+				>
+					{Object.getOwnPropertyNames(posMap).map((x: string) => (
+						<option value={posMap[x as keyof typeof posMap]}>
+							{x}
+						</option>
+					))}
+				</select>
+				<input
+					style={{ marginRight: "1rem" }}
+					type="text"
+					value={def}
+					onChange={(e) => setDef(e.currentTarget.value)}
+				/>
+				<button
+					onClick={() => {
+						if (expandedItems.keys().next().value) {
+							setExpandedItems(new Set());
+						} else {
+							console.log("empty");
+							setExpandedItems(
+								new Set(
+									Object.getOwnPropertyNames(lexicon).filter(
+										(x: string) =>
+											lexicon[x].derivations &&
+											Object.getOwnPropertyNames(
+												lexicon[x].derivations
+											).length > 0
+									)
+								)
+							);
+						}
+					}}
+				>
+					▶
+				</button>
+				<button
+					onClick={() => {
+						window.scrollTo({
+							top: document.documentElement.scrollHeight,
+							behavior: "smooth",
+						});
+					}}
+				>
+					ᐯ
+				</button>
+			</p>
+		);
+	}
+
 	return (
 		<>
 			<h1>
@@ -268,8 +350,8 @@ const Language = ({
 					.join("")}{" "}
 				Lexicon
 			</h1>
-			{buildFilterBar(search, setSearch, posFilter, setPos, def, setDef)}
-			{buildLexiconList(lexicon, search, posFilter, def)}
+			{buildFilterBar()}
+			{buildLexiconList()}
 			<AdminPanel
 				language={language}
 				copyText={copyText}

@@ -6,7 +6,7 @@ import {
 	ref,
 	uploadBytes,
 } from "firebase/storage";
-import { Word } from "../pages/wb/langs/[name]";
+import { Word } from "./langsHelpers";
 
 export type FirebaseApps = {
 	app: FirebaseApp;

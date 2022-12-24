@@ -3,7 +3,7 @@ import { useRef } from "react";
 import { useState } from "react";
 import useAdmin from "../lib/authenticate";
 import { addWord } from "../lib/libFirebase";
-import { Word, wordType } from "../pages/wb/langs/[name]";
+import { diacriticList, Word, wordType } from "../lib/langsHelpers";
 import { firebaseStorage } from "../pages/_app";
 
 const AdminPanel = ({
@@ -17,7 +17,6 @@ const AdminPanel = ({
 }) => {
 	const admin = useAdmin();
 	const router = useRouter();
-	console.log(admin);
 
 	const [newWord, setNewWord] = useState("");
 	const [newPos, setNewPos] = useState<wordType>("n");
@@ -87,39 +86,30 @@ const AdminPanel = ({
 						>
 							+
 						</button>
+						{
+							// Create helpers for inputting special characters
+							diacriticList.map((x: string) => (
+								<button
+									style={{
+										height: "1.6rem",
+										width: "1.6rem",
+										fontSize: "1.0rem",
+									}}
+									onClick={() => {
+										setNewWord((c) => c + x);
+										defRef.current?.focus();
+									}}
+								>
+									{x}
+								</button>
+							))
+						}
 						<button
-							onClick={() => {
-								setNewWord((x) => x + "ā");
-								defRef.current?.focus();
+							style={{
+								height: "1.6rem",
+								width: "1.6rem",
+								fontSize: "1.0rem",
 							}}
-						>
-							ā
-						</button>
-						<button
-							onClick={() => {
-								setNewWord((x) => x + "ē");
-								defRef.current?.focus();
-							}}
-						>
-							ē
-						</button>
-						<button
-							onClick={() => {
-								setNewWord((x) => x + "ī");
-								defRef.current?.focus();
-							}}
-						>
-							ī
-						</button>
-						<button
-							onClick={() => {
-								setNewWord((x) => x + "ū");
-								defRef.current?.focus();
-							}}
-						>
-							ū
-						</button>
-						<button
 							onClick={() => {
 								copyText();
 							}}
@@ -127,6 +117,11 @@ const AdminPanel = ({
 							🗄
 						</button>
 						<button
+							style={{
+								height: "1.6rem",
+								width: "1.6rem",
+								fontSize: "1.0rem",
+							}}
 							onClick={() => {
 								window.scrollTo({
 									top: 0,
