@@ -42,6 +42,7 @@ export async function renderMD(path: string) {
 
 export async function getPostData(id: string): Promise<Post> {
 	const fullPath = path.join("./articles/", `${id}.mdx`);
+
 	const fileContents = fs.readFileSync(fullPath, "utf8");
 
 	const processedContent = await unified()
@@ -76,3 +77,8 @@ export async function getPostList(): Promise<string[]> {
 	).articles;
 	return Object.keys(articles);
 }
+
+export const getLessons = async (path: string) => {
+	const lesson = await renderMD(path);
+	return { contentHtml: lesson.contentHtml };
+};

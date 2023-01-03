@@ -4,6 +4,7 @@ export type Word = {
 	definition: string[];
 	type: wordType;
 	derivations?: { [x: string]: Word };
+	pronunciation?: string;
 };
 
 export const diacriticMap = {

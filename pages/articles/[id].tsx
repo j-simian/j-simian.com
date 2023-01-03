@@ -4,7 +4,6 @@ import Link from "next/link";
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
 	const postData = await getPostData(params!.id as string);
-
 	return { props: { postData } };
 };
 

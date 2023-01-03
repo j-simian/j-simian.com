@@ -10,10 +10,12 @@ const AdminPanel = ({
 	language,
 	copyText,
 	size,
+	lexicon,
 }: {
 	language: string;
 	copyText: () => void;
 	size: number;
+	lexicon: { [x: string]: Word };
 }) => {
 	const admin = useAdmin();
 	const router = useRouter();
@@ -30,7 +32,7 @@ const AdminPanel = ({
 		const obj: { [x: string]: Word } = {
 			[word]: { type: pos, definition: def },
 		};
-		addWord(firebaseStorage, language, obj);
+		addWord(firebaseStorage, language, obj, lexicon);
 	}
 
 	return (
@@ -79,7 +81,10 @@ const AdminPanel = ({
 								setNewPos("n");
 								setNewDef([]);
 								setTimeout(
-									() => router.push(`/wb/langs/${language}`),
+									() =>
+										router.push(
+											`/wb/langs/${language}/lexicon`
+										),
 									500
 								);
 							}}

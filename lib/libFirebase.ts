@@ -40,9 +40,9 @@ export async function getLexicon(storage: FirebaseStorage, lang: string) {
 export async function addWord(
 	storage: FirebaseStorage,
 	lang: string,
-	word: { [x: string]: Word }
+	word: { [x: string]: Word },
+	lexicon: { [x: string]: Word }
 ) {
-	let lexicon = await getLexicon(storage, lang);
 	lexicon = { ...lexicon, ...word };
 	let string = JSON.stringify(lexicon, null, 4);
 	const storageRef = ref(storage, `langs/${lang}/lexicon.json`);
