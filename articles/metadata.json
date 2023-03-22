@@ -12,6 +12,12 @@
 			"tags": ["linguistics", "computerscience"],
 			"title": "English as a CFG",
 			"subtitle": "We know about CFGs in computer science from compilers, but did you know we can apply them to natural languages too?"
+		},
+		"2": {
+			"dateCreated": "2023-02-19",
+			"tags": ["computerscience"],
+			"title": "Using Vim & Tmux without emulating an IDE",
+			"subtitle": "Lots of new Vim users try to emulate VSCode when they first start using Vim; let me try to convince you not to do that."
 		}
 	}
 }

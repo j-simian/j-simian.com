@@ -1,0 +1,37 @@
+Using Vim as an editor was a natural progression for me - I love anything that I can customise completely to my needs (moving from Windows to Arch Linux was the biggest upgrade of my life), so discovering VSCode and its extensions was felt like magic after using Eclipse for so many years, and going from VSCode to Vim was an even bigger improvement; however I know alot of people aren't convinced it is any better than an IDE, especially with the ubiquity of Vim binding support.
+
+Lots of people when they first start using Vim post questions on forums that look something like _"What plugins should I install to make Vim look like VSCode?"_. This is only natural, as switching from something like VSCode that does everything for you to something like Vim is a pretty massive jump, and most people are already suffering from the decrease in productivity of learning the keybinds alone (which is why I am a huge advocate for learning the keybinds through [your IDE's built in Vim extension](https://marketplace.visualstudio.com/items?itemName=vscodevim.vim)) and so just want something that looks familiar. In the long run, however, I believe it is better to forgo this mindset and build your own Vim configuration that has a clean interface, but is fast.
+
+### File Browsing
+
+In VSCode, files are displayed in a tree on the left hand side of the code editor. This can easily be simulated in Vim using a plugin such as [nvim-tree](https://marketplace.visualstudio.com/items?itemName=vscodevim.vim), and while I use this on occasion, I generally much prefer using [Telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) to browse files, which feels much more Vim focused.
+
+A workflow with telescope rather than an IDE-like file browser involves me thinking "I need to edit file `abc.xyz`", typing `\ff`, typing the first few characters of the name of the file, and hitting enter. I almost never need to think about where the file is located, and even in larger codebases typing the first 5-10 characters of the name will get the file in the first few results of the list, and Telescope provides a handy preview of the file in another pane.
+
+<Image src="/2_1_telescope.png"></Image>
+
+But what if you don't know the name of the file? In that case, a tree view of the file structure isn't going to help you anyway. Using Telescope, you have a handy feature called **live grep**, which allows you to search in the contents of files in your working directory, and it's incredibly fast (in a project with over 200,000 files, it still finds matches in milliseconds). Just type `\fg` and search for a line of code you want to edit, and Telescope will present you with a list of files that have contents that match your search.
+
+<Image src="/2_2_telescope.png"></Image>
+
+Okay, so file browsing is better in Vim, but what about editing multiple files at once?
+
+### Multifile editing with Tmux
+
+When using an IDE, a common workflow is to have a bunch of files open in tabs, and to switch between them by clicking on the file you want at the top. Some users use a side-by-side view to edit two files at once. Using Telescope to search for a file you want to edit alone is probably faster than reading the tab names to find the one you want (especially when you start to use Vim shortcuts such as `<C-6>` to quickly switch back to the last file you edited), but using a few tricks we can efficiently handle multifile workflows easily.
+
+While Vim has support for windows and tabs, I prefer to use [Tmux](https://github.com/tmux/tmux/wiki) to handle window management as it is designed exclusively for this purpose and is quite a bit more powerful. Tmux is a terminal multiplexer, meaning it allows you to run multiple terminals within a single terminal. Tmux organises your terminals into _sessions_, _windows_, and _panes_.
+
+Using [tmux-resurrect](https://github.com/tmux-plugins/tmux-resurrect) we can make these views persistent through restarts, so I personally have sessions for each individual project that I can quickly switch between using `<C-B><s>`, `<{session-number}>`. Within these sessions, I can have multiple windows, typically one for editing code and one for handling code compilation, testing and git.
+
+<Image src="/2_3_tmux.png"></Image>
+
+Within windows, we use panes to organise what is actually displayed on the screen at any one time. We start by default with one fullscreen pane, which we can split horizontally with `<C-B><%>` and vertically with `<C-B><">`. Combining these two, we can have any arrangement of panes we want on the screen, and without the clutter of a console, outline and file tree we can have not just two files but up to four individual files at once (on a big 32 inch display I even sometimes have up to 8). This is really useful because most of the time when solving a problem we don't really need to consider more than 4 files at any one time.
+
+<Image src="/2_4_tmux.png"></Image>
+
+Having all the files you need at once on the screen can be super helpful, but sometimes you just need to dig deep into one file. Instead of closing all your other panes, you can simply hit `<C-B><Z>` to _zoom_ into one pane, making it fullscreen while retaining all your other panes, and do the same again to return the the multipane view.
+
+### Conclusion
+
+There is of course far more than just this when it comes to using Vim, but I felt that these two key components of a developer's workflow really demonstrate the advantages of switching from your IDE. These two techniques are very different to how most developers interact with their code, but I have found that for myself, the learning curve has definitely been worth it and my speed of navigating between and editing multiple files at once is far superior to when I was using an IDE.
