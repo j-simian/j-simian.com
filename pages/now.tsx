@@ -5,13 +5,13 @@ const NowPage = () => {
         <p style={{ fontSize: "20px" }}>
           Sort of like a six-monthly social media update status - sharing your
           current projects and where you are in your life, like if an old friend
-          asked, "So, what have you been up to?"
+          asked, &quot;So, what have you been up to?&quot;
         </p>
       </blockquote>
       <h3>Academics</h3>
       <p>
-        I'm in Michaelmas term of my final year at Oxford before graduating.
-        This term I am studying:
+        I&apos;m in Michaelmas term of my final year at Oxford before
+        graduating. This term I am studying:
         <ul>
           <li>Computer Aided Formal Verification</li>
           <li>Information Theory</li>
@@ -32,8 +32,8 @@ const NowPage = () => {
       </ul>
       <h3>Misc</h3>
       <p>
-        I'm the sound designer and pianist in a student production of The Trail
-        to Oregon!{" "}
+        I&apos;m the sound designer and pianist in a student production of The
+        Trail to Oregon!
       </p>
     </>
   );
