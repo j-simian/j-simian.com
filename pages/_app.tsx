@@ -7,17 +7,20 @@ import { useRouter } from "next/router";
 import { initialiseFirebase } from "../lib/libFirebase";
 
 export const { app: firebaseApp, storage: firebaseStorage } =
-	initialiseFirebase();
+  initialiseFirebase();
 
 function MyApp({ Component, pageProps }: AppProps) {
-	const router = useRouter();
-	return (
-		<>
-			<Head nav={router.asPath == "/"} />
-			<Component {...pageProps} />
-			<Analytics />
-		</>
-	);
+  const router = useRouter();
+
+  const navPages = ["/", "/now", "/links", "/about", "/uses"];
+
+  return (
+    <>
+      <Head nav={navPages.includes(router.asPath)} />
+      <Component {...pageProps} />
+      <Analytics />
+    </>
+  );
 }
 
 export default MyApp;

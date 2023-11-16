@@ -4,13 +4,14 @@ import Image from "next/image";
 import Router from "next/router";
 import { useState } from "react";
 import Link from "next/link";
+import styles from "../styles/Head.module.css";
 
 const Head = ({ nav }: { nav: boolean }) => {
   const [opacity, setOpacity] = useState(0.0);
   return (
     <div
       style={{
-        width: "68vw",
+        width: "90vw",
         display: "flex",
         flexDirection: "row",
         justifyContent: "space-between",
@@ -63,9 +64,43 @@ const Head = ({ nav }: { nav: boolean }) => {
         </div>
       </div>
       {nav ? (
-        <Link href="/about" style={{ textAlign: "right" }}>
-          About
-        </Link>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "end",
+            maxWidth: "250px",
+          }}
+        >
+          <Link
+            className={styles.nav_link}
+            href="/uses"
+            style={{ textAlign: "right" }}
+          >
+            Uses
+          </Link>
+          <Link
+            className={styles.nav_link}
+            href="/now"
+            style={{ textAlign: "right" }}
+          >
+            Now
+          </Link>
+          <Link
+            className={styles.nav_link}
+            href="/links"
+            style={{ textAlign: "right" }}
+          >
+            Links
+          </Link>
+          <Link
+            className={styles.nav_link}
+            href="/about"
+            style={{ textAlign: "right" }}
+          >
+            About
+          </Link>
+        </div>
       ) : (
         <></>
       )}
