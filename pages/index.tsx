@@ -56,7 +56,6 @@ const Home = ({ postList }: { postList: PostMetadata[] }) => {
   };
   return (
     <>
-      <h4 style={{ color: "grey" }}>Posts</h4>
       {filters.tags || filters.dateL || filters.dateR ? (
         <div style={{ marginBottom: 0, display: "block" }}>
           <p

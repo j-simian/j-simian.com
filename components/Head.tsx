@@ -74,6 +74,27 @@ const Head = ({ nav }: { nav: boolean }) => {
         >
           <Link
             className={styles.nav_link}
+            href="/uses"
+            style={{ textAlign: "right" }}
+          >
+            Uses
+          </Link>
+          <Link
+            className={styles.nav_link}
+            href="/now"
+            style={{ textAlign: "right" }}
+          >
+            Now
+          </Link>
+          <Link
+            className={styles.nav_link}
+            href="/links"
+            style={{ textAlign: "right" }}
+          >
+            Links
+          </Link>
+          <Link
+            className={styles.nav_link}
             href="/about"
             style={{ textAlign: "right" }}
           >
