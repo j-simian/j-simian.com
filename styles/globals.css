@@ -22,7 +22,8 @@ a {
 }
 
 i,
-b {
+b, 
+em, sup, sub {
   margin: 0 !important;
   padding: 0 !important;
 }

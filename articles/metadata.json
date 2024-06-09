@@ -18,6 +18,12 @@
 			"tags": ["computerscience"],
 			"title": "Using Vim & Tmux without emulating an IDE",
 			"subtitle": "Lots of new Vim users try to emulate VSCode when they first start using Vim; let me try to convince you not to do that."
+		},
+		"4": {
+			"dateCreated": "2024-06-09",
+			"tags": ["music", "computerscience"],
+			"title": "Floating point bit depths explained",
+			"subtitle": "Why do floating point bit depths prevent clipping?"
 		}
 	}
 }

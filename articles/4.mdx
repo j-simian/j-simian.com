@@ -1,0 +1,30 @@
+### Some background
+
+The _bit depth_ of a digital audio signal refers to how many bits are used to store individual samples the analog signal. When digitising an analog signal, we split it up into samples taken at the _sample rate_, and store the amplitude of the signal at the given point, quantising it to fit into the given bit depth. 
+
+As an example, if we have a signal that consists of just a pure sine wave with an amplitude of ⅓, the sample taken at the maximum value should represent ⅓. To represent this in an 8-bit file, we would say ⅓ * 2<sup>8</sup> = 85⅓ and round this to 85, storing the byte `0x55` for this sample.
+
+### The problems with this
+
+There are two problems with doing it as above. The first is that it limits the _dynamic range_ of our signal. This term means the difference in volume between the quietest sound and the loudest sound. This is because any amplitude below 2<sup>-9</sup> will be rounded to 0, so any sounds quieter than this are lost. 
+
+The second problem is that we cannot represent any value above 1. This might not seem like a problem, as more than 100% amplitude doesn\'t make much sense (our speakers can\'t move more than 100% of their range), but in the context of audio processing, this can cause problems.
+
+As an example, if try and mix two audio signals with amplitudes of 1, the output should have amplitude 2, but because the greatest amplitude we can represent is 1, we lose all information above this. This is called _clipping_. To mitigate this, we can halve the amplitudes of the signal before adding them, but we lose some information by doing this as some quiet parts of the signal will now drop below the dynamic range threshold.
+
+
+<div style="width: 600px;">
+	<Image src="/4_1.svg" />
+</div>
+
+### Floating point bit depth
+
+In floating point bit depth, instead of storing the sample as amplitude * 2<sup>bit depth</sup>, we use a floating point number to directly store the sample's amplitude. Using 32-bit floating point, this means the smallest value we can represent is on the order of 10<sup>-38</sup>, and the largest is on the order of 10<sup>38</sup>. This allows both quieter and louder values than the equivalent fixed point representation (2<sup>-32</sup>).
+
+As a result, we don't have to worry about clipping when adding signals (if our signal has reached 10<sup>38</sup>, we have other problems to worry about!) and we have a much greater dynamic range to work with. 
+
+However, we can't get all this extra information for free. The resolution of individual samples is lower, even if we can encode smaller numbers. This is because we have to use some of the bits to encode the exponent. As a result, we can encode numbers with 23 bits of precision, while fixed point uses the full 32 bits to for precision.
+
+### Conclusion
+
+32-bit floating point is an invaluable tool for users of DAWs and other audio processing software. For consumers however, 24-bit fixed point is easily adequate, considering its dynamic range of ~150dB is greater than the range for human hearing. As a result, audio can be processed in 32-bit floating point and as a final step exported down to 24-bit fixed for distribution.  
