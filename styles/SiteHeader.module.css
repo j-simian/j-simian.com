@@ -1,0 +1,65 @@
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  max-width: var(--content-wide);
+  margin: 0 auto;
+}
+
+.logoLink {
+  display: block;
+  text-decoration: none;
+}
+
+.logoLink:hover {
+  text-decoration: none;
+}
+
+.logoContainer {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.logoBw {
+  transition: opacity 0.5s ease;
+}
+
+.logoColor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.logoContainer:hover .logoBw {
+  opacity: 0;
+}
+
+.logoContainer:hover .logoColor {
+  opacity: 1;
+}
+
+.nav {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2rem;
+}
+
+.navLink {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.navLink:hover {
+  color: var(--color-accent);
+  text-decoration: none;
+}

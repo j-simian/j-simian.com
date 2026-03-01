@@ -1,6 +1,5 @@
 import type { AppProps } from "next/app";
-import "prismjs/themes/prism-tomorrow.css";
-import Head from "../components/Head";
+import SiteHeader from "../components/SiteHeader";
 import { Analytics } from "@vercel/analytics/react";
 import "../styles/globals.css";
 import { useRouter } from "next/router";
@@ -16,11 +15,14 @@ function MyApp({ Component, pageProps }: AppProps) {
 	const navPages = ["/", "/now", "/links", "/about", "/uses"];
 
 	return (
-		<>
-			<Head nav={navPages.includes(router.asPath)} />
-			<Component {...pageProps} />
+		<div className="site-wrapper">
+			<SiteHeader nav={navPages.includes(router.asPath)} />
+			<main className="site-main">
+				<Component {...pageProps} />
+			</main>
 			<Analytics />
-		</>
+			<SpeedInsights />
+		</div>
 	);
 }
 

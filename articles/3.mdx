@@ -13,9 +13,7 @@ The second problem is that we cannot represent any value above 1. This might not
 As an example, if try and mix two audio signals with amplitudes of 1, the output should have amplitude 2, but because the greatest amplitude we can represent is 1, we lose all information above this. This is called _clipping_. To mitigate this, we can halve the amplitudes of the signal before adding them, but we lose some information by doing this as some quiet parts of the signal will now drop below the dynamic range threshold.
 
 
-<div style="width: 600px;">
-	<Image src="/4_1.svg" />
-</div>
+<Image src="/4_1.svg" style="max-width: 600px;" />
 
 ### Floating point bit depth
 

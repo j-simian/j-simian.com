@@ -1,7 +1,7 @@
 import type { GetStaticProps } from "next";
 import { getPostList, getPostMetadata, PostMetadata } from "../lib/getPostData";
 import { Tag } from "./articles/[id]";
-import Router, { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import Link from "next/link";
 
 export const getStaticProps: GetStaticProps = async () => {
@@ -57,70 +57,32 @@ const Home = ({ postList }: { postList: PostMetadata[] }) => {
   return (
     <>
       {filters.tags || filters.dateL || filters.dateR ? (
-        <div style={{ marginBottom: 0, display: "block" }}>
-          <p
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              flexDirection: "row",
-              width: "48rem",
-            }}
-          >
-            <span
-              style={{
-                textAlign: "left",
-                marginLeft: 0,
-                marginTop: 0,
-                marginBottom: 0,
-              }}
-            >
-              Filtering to:
-            </span>
-            <span
-              style={{
-                textAlign: "right",
-                marginRight: 0,
-                marginTop: 0,
-                marginBottom: 0,
-              }}
-            >
-              <Link
-                href="/"
-                onClick={() => {
-                  filters = {};
-                }}
-              >
-                ╳
-              </Link>
-            </span>
-          </p>
-          {filters.tags && filters.tags.length > 0 ? (
-            <p style={{ display: "block" }}>
-              {filters.tags!.map((x: string, i) => (
+        <div className="filterBar">
+          <div className="filterHeader">
+            <span>Filtering to:</span>
+            <Link href="/" className="filterClose">
+              &#x2715;
+            </Link>
+          </div>
+          {filters.tags && filters.tags.length > 0 && (
+            <p>
+              {filters.tags.map((x: string, i) => (
                 <Tag tagName={x} key={i} />
               ))}
             </p>
-          ) : (
-            ""
           )}
-          {filters.dateR ? (
+          {filters.dateR && (
             <p>
               Posts before <code>{filters.dateR}</code>,
             </p>
-          ) : (
-            ""
           )}
-          {filters.dateL ? (
+          {filters.dateL && (
             <p>
               Posts after <code>{filters.dateL}</code>
             </p>
-          ) : (
-            ""
           )}
         </div>
-      ) : (
-        <></>
-      )}
+      ) : null}
       <div>{buildPostList(postList, filters)}</div>
     </>
   );
@@ -128,22 +90,19 @@ const Home = ({ postList }: { postList: PostMetadata[] }) => {
 
 const Card = ({ postData }: { postData: PostMetadata }) => {
   return (
-    <div
-      className="postCard"
-      onClick={(_) => Router.push(`/articles/${postData.id}`)}
-    >
+    <Link href={`/articles/${postData.id}`} className="postCard">
       <h2>{postData.title}</h2>
       <p className="subtitle">{postData.subtitle}</p>
-      <div className="metaContainer" style={{ display: "flex" }}>
+      <div className="metaContainer">
         <p className="tags">
           Tags:
           {postData.tags.map((x: string, i) => (
-            <Tag tagName={x} key={i} />
+            <span className="tagElement" key={i}>{`#${x}`}</span>
           ))}
         </p>
-        <p style={{ margin: 0 }}>Date published: {postData.dateCreated}</p>
+        <p className="datePublished">{postData.dateCreated}</p>
       </div>
-    </div>
+    </Link>
   );
 };
 
